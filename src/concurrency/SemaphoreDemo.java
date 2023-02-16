@@ -5,22 +5,17 @@ package concurrency;
 
 import java.util.concurrent.Semaphore;
 
-//A shared resource/class. 
-class Shared 
+class WorkerThread extends Thread
 { 
-	static int count = 0; 
-} 
+	Semaphore sem;
+	SharedObject sharedObject;
 
-class MyThread extends Thread 
-{ 
-	Semaphore sem; 
-	String threadName; 
-	public MyThread(Semaphore sem, String threadName) 
+	public WorkerThread(Semaphore sem, SharedObject sharedObject, String threadName)
 	{ 
 		super(threadName); 
-		this.sem = sem; 
-		this.threadName = threadName; 
-	} 
+		this.sem = sem;
+		this.sharedObject = sharedObject;
+	}
 
 	@Override
 	public void run() { 
@@ -28,24 +23,24 @@ class MyThread extends Thread
 		// run by thread A 
 		if(this.getName().equals("A")) 
 		{ 
-			System.out.println("Starting " + threadName); 
+			System.out.println("Starting " + getName());
 			try
 			{ 
 				// First, get a permit. 
-				System.out.println(threadName + " is waiting for a permit."); 
+				System.out.println(getName() + " is waiting for a permit.");
 			
 				// acquiring the lock 
 				sem.acquire(); 
 			
-				System.out.println(threadName + " gets a permit."); 
+				System.out.println(getName() + " gets a permit.");
 		
 				// Now, accessing the shared resource. 
 				// other waiting threads will wait, until this 
 				// thread release the lock 
 				for(int i=0; i < 5; i++) 
 				{ 
-					Shared.count++; 
-					System.out.println(threadName + ": " + Shared.count); 
+					sharedObject.count++;
+					System.out.println(getName() + ": " + sharedObject.count);
 		
 					// Now, allowing a context switch -- if possible. 
 					// for thread B to execute 
@@ -56,31 +51,31 @@ class MyThread extends Thread
 				} 
 		
 				// Release the permit. 
-				System.out.println(threadName + " releases the permit."); 
+				System.out.println(getName() + " releases the permit.");
 				sem.release(); 
 		} 
 		
 		// run by thread B 
 		else
 		{ 
-			System.out.println("Starting " + threadName); 
+			System.out.println("Starting " + getName());
 			try
 			{ 
 				// First, get a permit. 
-				System.out.println(threadName + " is waiting for a permit."); 
+				System.out.println(getName() + " is waiting for a permit.");
 			
 				// acquiring the lock 
 				sem.acquire(); 
 			
-				System.out.println(threadName + " gets a permit."); 
+				System.out.println(getName() + " gets a permit.");
 		
 				// Now, accessing the shared resource. 
 				// other waiting threads will wait, until this 
 				// thread release the lock 
 				for(int i=0; i < 5; i++) 
 				{ 
-					Shared.count--; 
-					System.out.println(threadName + ": " + Shared.count); 
+					sharedObject.count--;
+					System.out.println(getName() + ": " + sharedObject.count);
 		
 					// Now, allowing a context switch -- if possible. 
 					// for thread A to execute 
@@ -90,7 +85,7 @@ class MyThread extends Thread
 					System.out.println(exc); 
 				} 
 				// Release the permit. 
-				System.out.println(threadName + " releases the permit."); 
+				System.out.println(getName() + " releases the permit.");
 				sem.release(); 
 		} 
 	} 
@@ -103,13 +98,14 @@ public class SemaphoreDemo
 	{ 
 		// creating a Semaphore object 
 		// with number of permits 1 
-		Semaphore sem = new Semaphore(1); 
+		Semaphore sem = new Semaphore(1);
+		SharedObject sharedObject = new SharedObject();
 		
 		// creating two threads with name A and B 
 		// Note that thread A will increment the count 
 		// and thread B will decrement the count 
-		MyThread mt1 = new MyThread(sem, "A"); 
-		MyThread mt2 = new MyThread(sem, "B"); 
+		WorkerThread mt1 = new WorkerThread(sem, sharedObject, "A");
+		WorkerThread mt2 = new WorkerThread(sem, sharedObject, "B");
 		
 		// stating threads A and B 
 		mt1.start(); 
@@ -121,7 +117,7 @@ public class SemaphoreDemo
 		
 		// count will always remain 0 after 
 		// both threads will complete their execution 
-		System.out.println("count: " + Shared.count); 
+		System.out.println("count: " + sharedObject.count);
 	} 
 } 
 
