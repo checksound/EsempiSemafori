@@ -1,4 +1,4 @@
-package concurrency;
+package sharedobject;
 
 //A shared resource/class.
 public class SharedObject {

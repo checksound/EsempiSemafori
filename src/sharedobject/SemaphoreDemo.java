@@ -1,4 +1,4 @@
-package concurrency;
+package sharedobject;
 
 // java program to demonstrate 
 // use of semaphores Locks 
