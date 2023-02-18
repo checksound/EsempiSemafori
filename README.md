@@ -1,6 +1,8 @@
 # Esempi Semafori
 
-Applicazione [sharedobject.SemaphoreDemo](./src/sharedobject/SemaphoreDemo.java)
+Applicazione senza utilizzo dei semafori [sheredobject.SheredObjectDemo](./src/)
+
+Applicazione con utilizzo dei semafori per ottenere la mutua esclusione [sharedobject.SemaphoreDemo](./src/sharedobject/SemaphoreDemo.java)
 
 
 ## Esempio alternanza

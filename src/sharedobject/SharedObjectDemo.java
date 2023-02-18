@@ -3,17 +3,13 @@ package sharedobject;
 // java program to demonstrate 
 // use of semaphores Locks 
 
-import java.util.concurrent.Semaphore;
-
-class WorkerThread extends Thread
+class WThread extends Thread
 { 
-	Semaphore sem;
 	SharedObject sharedObject;
 
-	public WorkerThread(Semaphore sem, SharedObject sharedObject, String threadName)
+	public WThread(SharedObject sharedObject, String threadName)
 	{ 
 		super(threadName); 
-		this.sem = sem;
 		this.sharedObject = sharedObject;
 	}
 
@@ -26,18 +22,8 @@ class WorkerThread extends Thread
 			System.out.println("Starting " + getName());
 			try
 			{ 
-				// First, get a permit. 
-				System.out.println(getName() + " is waiting for a permit.");
-			
-				// acquiring the lock 
-				sem.acquire(); 
-			
-				System.out.println(getName() + " gets a permit.");
-		
-				// Now, accessing the shared resource. 
-				// other waiting threads will wait, until this 
-				// thread release the lock 
-				for(int i=0; i < 5; i++) 
+
+				for(int i=0; i < 5; i++)
 				{ 
 					sharedObject.count++;
 					System.out.println(getName() + ": " + sharedObject.count);
@@ -50,10 +36,7 @@ class WorkerThread extends Thread
 					System.out.println(exc); 
 				} 
 		
-				// Release the permit. 
-				System.out.println(getName() + " releases the permit.");
-				sem.release(); 
-		} 
+		}
 		
 		// run by thread B 
 		else
@@ -61,18 +44,8 @@ class WorkerThread extends Thread
 			System.out.println("Starting " + getName());
 			try
 			{ 
-				// First, get a permit. 
-				System.out.println(getName() + " is waiting for a permit.");
-			
-				// acquiring the lock 
-				sem.acquire(); 
-			
-				System.out.println(getName() + " gets a permit.");
-		
-				// Now, accessing the shared resource. 
-				// other waiting threads will wait, until this 
-				// thread release the lock 
-				for(int i=0; i < 5; i++) 
+
+				for(int i=0; i < 5; i++)
 				{ 
 					sharedObject.count--;
 					System.out.println(getName() + ": " + sharedObject.count);
@@ -84,28 +57,23 @@ class WorkerThread extends Thread
 			} catch (InterruptedException exc) { 
 					System.out.println(exc); 
 				} 
-				// Release the permit. 
-				System.out.println(getName() + " releases the permit.");
-				sem.release(); 
-		} 
+		}
 	} 
 } 
 
 // Driver class 
-public class SemaphoreDemo 
+public class SharedObjectDemo
 { 
 	public static void main(String[] args) throws InterruptedException
 	{ 
-		// creating a Semaphore object 
-		// with number of permits 1 
-		Semaphore sem = new Semaphore(1);
+
 		SharedObject sharedObject = new SharedObject();
 		
 		// creating two threads with name A and B 
 		// Note that thread A will increment the count 
 		// and thread B will decrement the count 
-		WorkerThread mt1 = new WorkerThread(sem, sharedObject, "A");
-		WorkerThread mt2 = new WorkerThread(sem, sharedObject, "B");
+		WThread mt1 = new WThread(sharedObject, "A");
+		WThread mt2 = new WThread(sharedObject, "B");
 		
 		// stating threads A and B 
 		mt1.start(); 
